@@ -1,11 +1,29 @@
 from flask import Flask
-#from rhino3dm import *
+from rhino3dm import *
+import time
 import ghhops_server as hs
 
 app = Flask(__name__)
 hops = hs.Hops(app)
 
+print(time.time())
 
+
+@hops.component(
+    "/info",
+    name="Info",
+    description="Basic info",
+    icon="icons/star.png",
+    inputs=[],
+    outputs=[
+        hs.HopsInteger("Time", "T", "Current time for version tracking")
+    ]
+)
+def info():
+    return round(time.time())
+
+
+'''
 @hops.component(
     "/pointat",
     name="PointAt",
@@ -21,6 +39,7 @@ hops = hs.Hops(app)
 )
 def pointat(curve, t):
     return curve.PointAt(t)
+'''
 
 
 @hops.component(
@@ -35,5 +54,5 @@ def pointat(curve, t):
         hs.HopsString("Output", "O", "Uppercase string")
     ]
 )
-def testing(S):
+def makeupper(S):
     return S.upper()
