@@ -1,10 +1,10 @@
 from flask import Flask
-from rhino3dm import *
+#from rhino3dm import *
 import ghhops_server as hs
 import time
 import requests
 from bs4 import BeautifulSoup
-
+import scraper
 
 app = Flask(__name__)
 hops = hs.Hops(app)
@@ -25,9 +25,10 @@ def info():
     return round(time.time()), 'unyxium'
 
 
+# DEPRECATE THE DEDICATED URL VERSION
 @hops.component(
-    "/scraper",
-    name="Web Scraper",
+    "/scrapeurl",
+    name="Scrape URL",
     description="Scrape a webpage for data",
     icon="icons/star.png",
     inputs=[
@@ -39,30 +40,36 @@ def info():
         hs.HopsString("Output", "O", "Output data")
     ]
 )
-def scrape(location, tree):
-    #location = 'https://example.com'
-    #tree = ['p']
+def ghscrape(location, tree):
+    result = scraper.scrapeurl(location, tree)
+    return [str(item) for item in result]
 
-    page = requests.get(location)
 
-    if page.status_code == 200:
-        subpage = [BeautifulSoup(page.content, features='lxml')]
+@hops.component(
+    "/scrapedoc",
+    name="Scrape Document",
+    description="Scrape a document for data",
+    icon="icons/star.png",
+    inputs=[
+        hs.HopsString("Document", "D", "Document at a single object"),
+        hs.HopsString("Elements", "E", "List of targeted elements in order",
+                      access="HopsParamAccess.TREE"),
+        hs.HopsString("Attributes", "A", "List of attributes to filter elements",
+                      access="HopsParamAccess.TREE",
+                      optional=True, default=None)
+    ],
+    outputs=[
+        hs.HopsString("Output", "O", "Output data")
+    ]
+)
+def ghscrapedoc(document, tree, attributes):
+    import json
+    attrdicts = [json.loads(attr) for attr in attributes]
+    if not len(attrdicts) == len(tree):
+        return 'Attribute length mismatch'
 
-        for tag in tree:
-            for item in subpage:
-                # found objs is for the next iteration
-                found_objs = []
-                for obj in item.find_all(tag):
-                    found_objs.append(obj)
-                #print('FOUND OBJS ::::: ', found_objs)
-            subpage = found_objs
-
-        # this took ages to debug... turns out the items weren't strings
-        result = [str(item) for item in subpage]
-
-        return result
-    else:
-        return [f'Could not connect to {location}']
+    result = scraper.findtags(document, tree, attrdicts)
+    return [str(item) for item in result]
 
 
 @hops.component(
