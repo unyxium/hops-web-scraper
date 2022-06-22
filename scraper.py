@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 
 def findtags(document, tree, attributes=None):
-    # if there are no attributes, create an empty list
+    # if there are no attributes, create an empty list of dicts
     if attributes == None:
         attributes = [{} for _ in range(len(tree))]
 
