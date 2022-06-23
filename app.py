@@ -1,10 +1,9 @@
-from flask import Flask
+from flask import Flask, request
 #from rhino3dm import *
 import ghhops_server as hs
 import time
-import requests
-from bs4 import BeautifulSoup
 import scraper
+import re
 
 app = Flask(__name__)
 hops = hs.Hops(app)
@@ -25,24 +24,20 @@ def info():
     return round(time.time()), 'unyxium'
 
 
-# DEPRECATE THE DEDICATED URL VERSION
 @hops.component(
-    "/scrapeurl",
-    name="Scrape URL",
-    description="Scrape a webpage for data",
+    "/getwebpage",
+    name="Get Webpage",
+    description="Download a webpage",
     icon="icons/star.png",
     inputs=[
         hs.HopsString("URL", "U", "Webpage URL"),
-        hs.HopsString("Elements", "E", "List of targeted elements in order",
-                      access="HopsParamAccess.TREE")
     ],
     outputs=[
-        hs.HopsString("Output", "O", "Output data")
+        hs.HopsString("Page", "P", "Webpage")
     ]
 )
-def ghscrape(location, tree):
-    result = scraper.scrapeurl(location, tree)
-    return [str(item) for item in result]
+def ghgwp(location):
+    return scraper.getwebpage(location)
 
 
 @hops.component(
@@ -73,6 +68,22 @@ def ghscrapedoc(document, tree, attributes):
 
 
 @hops.component(
+    "/striptags",
+    name="Strip Tags",
+    description="Strip tags from input and return plain text",
+    icon="icons/star.png",
+    inputs=[
+        hs.HopsString("Input", "I", "Input text")
+    ],
+    outputs=[
+        hs.HopsString("Output", "O", "Output text")
+    ]
+)
+def striptags(document):
+    return re.sub(pattern='<\/?.+?>', repl='', string=document)
+
+
+@hops.component(
     "/test",
     name="TEST",
     description="Testing",
@@ -84,5 +95,9 @@ def ghscrapedoc(document, tree, attributes):
         hs.HopsString("Output", "O", "Output values")
     ]
 )
-def testing(i):
-    return i
+def testing(input):
+    return input
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
