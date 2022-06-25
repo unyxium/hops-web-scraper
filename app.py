@@ -1,5 +1,4 @@
-from flask import Flask, request
-#from rhino3dm import *
+from flask import Flask
 import ghhops_server as hs
 import os
 import time
@@ -9,6 +8,7 @@ import re
 app = Flask(__name__)
 hops = hs.Hops(app)
 
+# PythonAnywhere has a HOME env var
 if os.getenv('HOME') == '/home/YCbCr':
     iconloc = '/home/YCbCr/hops/icons/'
 else:
@@ -57,17 +57,25 @@ def ghgwp(location):
                       access='HopsParamAccess.TREE'),
         hs.HopsString('Attributes', 'A', 'List of attributes to filter elements',
                       access='HopsParamAccess.TREE',
-                      optional=True, default=None)
+                      optional=True)
     ],
     outputs=[
         hs.HopsString('Output', 'O', 'Output data')
     ]
 )
-def ghscrapedoc(document, tree, attributes):
-    import json
-    attrdicts = [json.loads(attr) for attr in attributes]
-    if not len(attrdicts) == len(tree):
-        return 'Attribute length mismatch'
+def ghscrapedoc(document, tree, attributes=''):
+    if attributes == None or attributes == ['']:
+        # None is detected by the function
+        attrdicts = None
+    else:
+        # parse list of dictionaries
+        import json
+        try:
+            attrdicts = [json.loads(attr, ) for attr in attributes]
+        except Exception as e:
+            return str(e)
+        if not len(attrdicts) == len(tree):
+            return 'Attribute length mismatch'
 
     result = scraper.findtags(document, tree, attrdicts)
     return [str(item) for item in result]
