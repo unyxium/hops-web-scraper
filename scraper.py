@@ -39,15 +39,3 @@ def scrapefile(location, tree, attributes=None):
 def getwebpage(URL):
     page = requests.get(URL)
     return str(page.content)
-
-
-# testing
-if __name__ == '__main__':
-    print('running test...')
-    '''print(scrapeurl(
-        location='https://example.com',
-        tree=['p', 'a']
-        #attributes=[{}, {'href': 'a'}]
-    )
-    )'''
-    print('page:' + getwebpage('https://example.com'))
