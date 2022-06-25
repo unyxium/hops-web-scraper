@@ -1,8 +1,8 @@
 from flask import Flask
 import ghhops_server as hs
 import os
-import time
 import scraper
+import json
 import re
 
 app = Flask(__name__)
@@ -22,19 +22,19 @@ else:
     icon=iconloc+'star.png',
     inputs=[],
     outputs=[
-        hs.HopsInteger('Time', 'T', 'Current time for version tracking'),
-        hs.HopsString('Author', 'A', 'Author')
+        hs.HopsString('Author', 'A', 'Author'),
+        hs.HopsString('Components', 'C', 'List of components available')
     ]
 )
 def info():
-    return round(time.time()), 'unyxium'
+    return 'unyxium', ['info', 'getwebpage', 'scrapedoc', 'striptags']
 
 
 @hops.component(
     '/getwebpage',
     name='Get Webpage',
     description='Download a webpage',
-    icon=iconloc+'star.png',
+    icon=iconloc+'earth.png',
     inputs=[
         hs.HopsString('URL', 'U', 'Webpage URL'),
     ],
@@ -50,7 +50,7 @@ def ghgwp(location):
     '/scrapedoc',
     name='Scrape Document',
     description='Scrape a document for data',
-    icon=iconloc+'star.png',
+    icon=iconloc+'page.png',
     inputs=[
         hs.HopsString('Document', 'D', 'Document at a single object'),
         hs.HopsString('Elements', 'E', 'List of targeted elements in order',
@@ -69,7 +69,6 @@ def ghscrapedoc(document, tree, attributes=''):
         attrdicts = None
     else:
         # parse list of dictionaries
-        import json
         try:
             attrdicts = [json.loads(attr, ) for attr in attributes]
         except Exception as e:
@@ -85,7 +84,7 @@ def ghscrapedoc(document, tree, attributes=''):
     '/striptags',
     name='Strip Tags',
     description='Strip tags from input and return plain text',
-    icon=iconloc+'star.png',
+    icon=iconloc+'notag.png',
     inputs=[
         hs.HopsString('Input', 'I', 'Input text')
     ],
