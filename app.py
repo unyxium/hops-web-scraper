@@ -55,15 +55,18 @@ def ghgwp(location):
         hs.HopsString('Document', 'D', 'Document at a single object'),
         hs.HopsString('Elements', 'E', 'List of targeted elements in order',
                       access='HopsParamAccess.TREE'),
-        hs.HopsString('Attributes', 'A', 'List of attributes to filter elements',
+        hs.HopsString('Attributes', 'A', 'List of attributes to filter elements (JSON dicts)',
                       access='HopsParamAccess.TREE',
-                      optional=True)
+                      optional=True),
+        hs.HopsInteger('Count', 'C', 'List of number of elements to retrieve. 0 means find all',
+                       access='HopsParamAccess.TREE',
+                       optional=True)
     ],
     outputs=[
         hs.HopsString('Output', 'O', 'Output data')
     ]
 )
-def ghscrapedoc(document, tree, attributes=''):
+def ghscrapedoc(document, tree, attributes='', count=0):
     if attributes == None or attributes == ['']:
         # None is detected by the function
         attrdicts = None
@@ -73,10 +76,17 @@ def ghscrapedoc(document, tree, attributes=''):
             attrdicts = [json.loads(attr, ) for attr in attributes]
         except Exception as e:
             return str(e)
-        if not len(attrdicts) == len(tree):
+        if not len(tree) == len(attrdicts):
             return 'Attribute length mismatch'
 
-    result = scraper.findtags(document, tree, attrdicts)
+    if count == [0]:
+        # None is detected by the function
+        count = None
+    else:
+        if not len(tree) == len(count):
+            return 'Count length mismatch'
+
+    result = scraper.findtags(document, tree, attrdicts, count)
     return [str(item) for item in result]
 
 
