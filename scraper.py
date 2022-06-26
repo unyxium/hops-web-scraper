@@ -53,4 +53,4 @@ def scrapefile(location, tree, attributes=None, count=None):
 
 def getwebpage(URL):
     page = requests.get(URL)
-    return str(page.content)
+    return str(page.text)
