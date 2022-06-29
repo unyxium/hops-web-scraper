@@ -106,21 +106,5 @@ def striptags(document):
     return re.sub(pattern='<\/?.+?>', repl='', string=document)
 
 
-@hops.component(
-    '/test',
-    name='TEST',
-    description='Testing',
-    icon=iconloc+'star.png',
-    inputs=[
-        hs.HopsString('Input', 'I', 'Input values')
-    ],
-    outputs=[
-        hs.HopsString('Output', 'O', 'Output values')
-    ]
-)
-def testing(input):
-    return input
-
-
 if __name__ == '__main__':
     app.run(debug=True)
